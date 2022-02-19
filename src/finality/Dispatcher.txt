@@ -1,0 +1,119 @@
+package finality;
+
+import java.util.*;
+
+public class Dispatcher {
+
+    public static void main(String[] args) {
+        List<Integer> marks = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5));    //fast way to initialize all marks of all students
+        List<Student> students = new ArrayList<>(Arrays.asList(new Student("Joshua Grehem", marks), new Student("Aaron Kimbol", marks),
+                new Student("Edward Sallow", marks), new Student("Robert House", marks), new Student("Michael Angelo", marks))
+        );
+        final Group group = new Group("HS", students);
+        System.out.println("Before modifying:\n" + group);
+
+        group.endOfStudying();
+
+        group.setGroupName("Shi");
+        group.setStudents(new ArrayList<>(Arrays.asList(new Student("J G", marks), new Student("A K", marks),
+                new Student("E S", marks), new Student("R H", marks), new Student("M A", marks))
+        ));
+        System.out.println("Part modifying:\n" + group);
+        group.setStudents(3, false, null);
+        group.getGroupName().concat("()()()()()()()()()");
+        group.getGroupName().replace('H', 's');
+        System.out.println(group.getStudents().get(3).getName());
+        //UnsupportedOperationException:
+//       group.getStudents().add(new Student("NEW1", marks));
+//        group.getStudents().set(0, new Student("NEW2", marks));
+//       group.getStudents().get(0).getMarks().add(100);
+//        group.getStudents().get(0).getMarks().set(0, 100);
+System.out.println(group.getGroupName());
+        System.out.println("After modifying:\n" + group);                       //The same as the previous output
+    }
+}
+
+class Student {
+
+    final private String name;
+    private List<Integer> marks;
+    private boolean isModifiable;
+
+    public Student(String name, List<Integer> marks) {
+        this.name = name;
+        this.marks = marks;
+        isModifiable = true;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Integer> getMarks() {
+        return marks;
+    }
+
+    public void  setMarks(List<Integer> marks) {
+    	if(isModifiable)
+    		this.marks = marks;
+    }
+    public void setMarks(int index, int mark) {
+    	if(isModifiable)
+    		marks.set(index, mark);
+    }
+    public void saveResults() {
+        marks = Collections.unmodifiableList(marks);
+        isModifiable = false;
+    }
+
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", marks=" + marks +
+                "}\n";
+    }
+}
+
+class Group {
+	private String groupName;
+    private List<Student> students;
+    private boolean isModifiable;
+    
+    public Group(String groupName, List<Student> students) {
+    	this.groupName = groupName;
+        this.students = new ArrayList<>(students);
+        isModifiable = true;
+    }
+    
+    public String getGroupName() {return groupName;}
+    public List<Student> getStudents() {return students;}
+    
+    public void setGroupName(String groupName) {
+    	if(isModifiable) this.groupName = groupName;
+    }
+    public void setStudents(List<Student> students) {
+    	if(isModifiable)
+    		this.students = students;
+    }
+    public void setStudents(int index, boolean addOrRemove, Student student) {
+    	if(isModifiable)
+    		if(addOrRemove)
+    			students.add(index, student);
+    		else students.remove(index);
+    }
+    public void setStudents(int index, Student student) {
+    	if(isModifiable)
+    			students.set(index, student);
+    }
+    
+    public void endOfStudying() {
+    	for(Student s : students){s.saveResults();}
+    	this.students = Collections.unmodifiableList(new ArrayList<>(students));
+      	isModifiable = false;
+    }
+
+
+    public String toString() {
+        return "Group "+ groupName + " {" + students + '}';
+    }
+}
